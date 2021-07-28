@@ -27,28 +27,46 @@ def draw_snake():
     for element in snake_body:
         pygame.draw.rect(WINDOW, "green", element)
 
+# boolean values to check for the snake not running into itself
+can_move_left = True
+can_move_right = True
+can_move_up = True
+can_move_down = True
+
 def move_snake():
-    global direction
+    global direction, can_move_left, can_move_right, can_move_up, can_move_down
     if direction == "left":
         new_snake_head = snake_body.pop()
         new_snake_head.x = snake_body[0].x - 20
         new_snake_head.y = snake_body[0].y
         snake_body.insert(0, new_snake_head)
+        can_move_right = False
+        can_move_down = True
+        can_move_up = True
     if direction == "right":
         new_snake_head = snake_body.pop()
         new_snake_head.x = snake_body[0].x + 20
         new_snake_head.y = snake_body[0].y
         snake_body.insert(0, new_snake_head)
+        can_move_left = False
+        can_move_down = True
+        can_move_up = True
     if direction == "up":
         new_snake_head = snake_body.pop()
         new_snake_head.x = snake_body[0].x
         new_snake_head.y = snake_body[0].y - 20
         snake_body.insert(0, new_snake_head)
+        can_move_down = False
+        can_move_left = True
+        can_move_right = True
     if direction == "down":
         new_snake_head = snake_body.pop()
         new_snake_head.x = snake_body[0].x
         new_snake_head.y = snake_body[0].y + 20
         snake_body.insert(0, new_snake_head)
+        can_move_up = False
+        can_move_left = True
+        can_move_right = True
 
 # timer to auto move snake
 MOVE_SNAKE = pygame.USEREVENT
@@ -107,13 +125,13 @@ while running:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
+            if event.key == pygame.K_UP and can_move_up:
                 direction = "up"
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN and can_move_down:
                 direction = "down"
-            if event.key == pygame.K_LEFT:
+            if event.key == pygame.K_LEFT and can_move_left:
                 direction = "left"
-            if event.key == pygame.K_RIGHT:
+            if event.key == pygame.K_RIGHT and can_move_right:
                 direction = "right"
         if event.type == MOVE_SNAKE:
             move_snake()
