@@ -86,6 +86,12 @@ def has_collided_with_target():
         return True
     return False
 
+def has_collided_with_itself():
+    for i in range(1, len(snake_body)):
+        if snake_body[0].colliderect(snake_body[i]):
+            return True
+    return False
+
 # when snake leaves the screen it reenters it from the other side
 def reenter_if_out_of_window():
     for element in snake_body:
@@ -145,17 +151,8 @@ while running:
                 points += 1
                 print(points)
             reenter_if_out_of_window()
+            if has_collided_with_itself():
+                running = False
 
-    # WINDOW.fill("black")
-
-    # draw_snake()
-    # draw_grid()
-    # draw_random_target()
-    # if has_collided_with_target():
-    #     add_to_snake()
-    #     calculate_random_target()
-    #     points += 1
-    #     print(points)
-    # reenter_if_out_of_window()
     clock.tick(FPS)
     pygame.display.update()
