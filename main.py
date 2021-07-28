@@ -28,15 +28,27 @@ def draw_snake():
         pygame.draw.rect(WINDOW, "green", element)
 
 def move_snake():
-    for element in snake_body:
-        if event.key == pygame.K_UP:
-            element.y -= 20
-        if event.key == pygame.K_DOWN:
-            element.y += 20
-        if event.key == pygame.K_LEFT:
-            element.x -= 20
-        if event.key == pygame.K_RIGHT:
-            element.x += 20
+    global direction
+    if direction == "left":
+        new_snake_head = snake_body.pop()
+        new_snake_head.x = snake_body[0].x - 20
+        new_snake_head.y = snake_body[0].y
+        snake_body.insert(0, new_snake_head)
+    if direction == "right":
+        new_snake_head = snake_body.pop()
+        new_snake_head.x = snake_body[0].x + 20
+        new_snake_head.y = snake_body[0].y
+        snake_body.insert(0, new_snake_head)
+    if direction == "up":
+        new_snake_head = snake_body.pop()
+        new_snake_head.x = snake_body[0].x
+        new_snake_head.y = snake_body[0].y - 20
+        snake_body.insert(0, new_snake_head)
+    if direction == "down":
+        new_snake_head = snake_body.pop()
+        new_snake_head.x = snake_body[0].x
+        new_snake_head.y = snake_body[0].y + 20
+        snake_body.insert(0, new_snake_head)
 
 # timer to auto move snake
 MOVE_SNAKE = pygame.USEREVENT
@@ -52,7 +64,7 @@ def draw_random_target():
     pygame.draw.rect(WINDOW, "red", target_rect)
 
 def has_collided_with_target():
-    if snake_head.colliderect(target_rect):
+    if snake_body[0].colliderect(target_rect):
         return True
     return False
 
@@ -70,12 +82,20 @@ def reenter_if_out_of_window():
 
 def add_to_snake():
     global i
-    new_element = pygame.Rect(snake_body_start_3.x + i, snake_body_start_3.y, 20, 20)
+    if direction == "left":
+        new_element = pygame.Rect(snake_body[len(snake_body) - 1].x + i, snake_body[len(snake_body) - 1].y, 20, 20)
+    if direction == "right":
+        new_element = pygame.Rect(snake_body[len(snake_body) - 1].x - i, snake_body[len(snake_body) - 1].y, 20, 20)
+    if direction == "up":
+        new_element = pygame.Rect(snake_body[len(snake_body) - 1].x, snake_body[len(snake_body) - 1].y + i, 20, 20)
+    if direction == "down":
+        new_element = pygame.Rect(snake_body[len(snake_body) - 1].x, snake_body[len(snake_body) - 1].y - 20, 20, 20)
     snake_body.append(new_element)
     i += 20
 
 points = 0
 i = 20
+direction = "left"
 # start target
 target_rect = pygame.Rect(random.randrange(0, WIN_WIDTH, 20), random.randrange(0, WIN_HEIGHT, 20), 20, 20)
 
@@ -87,21 +107,37 @@ while running:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            move_snake()
+            if event.key == pygame.K_UP:
+                direction = "up"
+            if event.key == pygame.K_DOWN:
+                direction = "down"
+            if event.key == pygame.K_LEFT:
+                direction = "left"
+            if event.key == pygame.K_RIGHT:
+                direction = "right"
         if event.type == MOVE_SNAKE:
-            for element in snake_body:
-                element.x -= 20
-    
-    WINDOW.fill("black")
+            move_snake()
+            WINDOW.fill("black")
+            draw_random_target()
+            draw_snake()
+            draw_grid()
+            if has_collided_with_target():
+                add_to_snake()
+                calculate_random_target()
+                points += 1
+                print(points)
+            reenter_if_out_of_window()
 
-    draw_snake()
-    draw_grid()
-    draw_random_target()
-    if has_collided_with_target():
-        add_to_snake()
-        calculate_random_target()
-        points += 1
-        print(points)
-    reenter_if_out_of_window()
+    # WINDOW.fill("black")
+
+    # draw_snake()
+    # draw_grid()
+    # draw_random_target()
+    # if has_collided_with_target():
+    #     add_to_snake()
+    #     calculate_random_target()
+    #     points += 1
+    #     print(points)
+    # reenter_if_out_of_window()
     clock.tick(FPS)
     pygame.display.update()
