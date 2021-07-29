@@ -1,5 +1,7 @@
 import pygame, sys, random
 
+from pygame.constants import USEREVENT
+
 pygame.init()
 
 WIN_WIDTH = 800
@@ -117,14 +119,32 @@ def add_to_snake():
     snake_body.append(new_element)
     i += 20
 
+# define fonts
+score_font = pygame.font.SysFont(None, 40)
+game_over_font = pygame.font.SysFont(None, 80)
+
+def show_score():
+    score_surface = score_font.render(f"Score: {points}", False, "orange")
+    WINDOW.blit(score_surface, (10, 10))
+
+def show_game_over():
+    game_over_surface = game_over_font.render("Game Over", True, "red")
+    game_over_rect = game_over_surface.get_rect()
+    game_over_rect.center = (WIN_WIDTH / 2, WIN_HEIGHT / 2)
+    WINDOW.blit(game_over_surface, game_over_rect)
+
 points = 0
 i = 20
 direction = "left"
 # start target
 target_rect = pygame.Rect(random.randrange(0, WIN_WIDTH, 20), random.randrange(0, WIN_HEIGHT, 20), 20, 20)
+game_over = False
 
 running = True
 while running:
+    if game_over == True:
+        pygame.time.delay(2000)
+        running = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -149,10 +169,11 @@ while running:
                 add_to_snake()
                 calculate_random_target()
                 points += 1
-                print(points)
             reenter_if_out_of_window()
             if has_collided_with_itself():
-                running = False
+                show_game_over()
+                game_over = True
 
+    show_score()
     clock.tick(FPS)
     pygame.display.update()
